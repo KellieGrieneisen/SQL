@@ -1,0 +1,130 @@
+#This project uses the following database of famous authors, their books, and characters
+
+CREATE TABLE authors (
+    ID INTEGER PRIMARY KEY,
+    first_name TEXT,
+    last_name TEXT
+    );
+INSERT INTO authors(first_name, last_name) VALUES ("Sarah","J Maas");
+INSERT INTO authors(first_name, last_name) VALUES ("Stephanie","Garber");
+INSERT INTO authors(first_name, last_name) VALUES ("J.K.","Rowling");
+INSERT INTO authors(first_name, last_name) VALUES ("Stephenie","Meyer");
+
+
+CREATE TABLE books (
+    ID INTEGER PRIMARY KEY,
+    title TEXT,
+    author_id INTEGER
+    );
+    
+INSERT INTO books(title, author_id) VALUES ("A Court of Thorns and Roses",1);
+INSERT INTO books(title, author_id) VALUES ("A Court of Mist and Fury",1);
+INSERT INTO books(title, author_id) VALUES ("A Court of Wings and Ruin",1);
+INSERT INTO books(title, author_id) VALUES ("A Court of Silver Flames",1);
+INSERT INTO books(title, author_id) VALUES ("Caraval",2);
+INSERT INTO books(title, author_id) VALUES ("Legendary",2);
+INSERT INTO books(title, author_id) VALUES ("Finale",2);
+INSERT INTO books(title, author_id) VALUES ("Once Upon a Broken Heart",2);
+INSERT INTO books(title, author_id) VALUES ("Harry Potter and the Sorcerers Stone",3);
+INSERT INTO books(title, author_id) VALUES ("Harry Potter and the Chamber of Secrets",3);
+INSERT INTO books(title, author_id) VALUES ("Harry Potter and the Prisoner of Azkaban",3);
+INSERT INTO books(title, author_id) VALUES ("Harry Potter and the Order of the Pheonix",3);
+INSERT INTO books(title, author_id) VALUES ("Twilight",4);
+INSERT INTO books(title, author_id) VALUES ("New Moon",4);
+INSERT INTO books(title, author_id) VALUES ("Eclipse",4);
+INSERT INTO books(title, author_id) VALUES ("Breaking Dawn",4);
+    
+CREATE TABLE characters (
+    ID INTEGER PRIMARY KEY,
+    name TEXT,
+    character_type TEXT,
+    book_id INTEGER
+    );
+    
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Feyre", "Main Character" , 1 );
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Feyre", "Main Character" , 2 );
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Feyre", "Main Character" , 3 );
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Elaine", "Side Character" , 1 );
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Elaine", "Side Character" , 2 );
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Elaine", "Side Character" , 3 );
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Elaine", "Side Character" , 4 );
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Nesta", "Main Character" , 4);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Scarlett Dragna", "Main Character" , 5);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Donatella Dragna", "Main Character" , 6);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Donatella Dragna", "Main Character" , 7);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Jacks", "Main Character" , 8);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Evangeline", "Main Character" , 8);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Hermione Granger", "Main Character" , 9);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Hermione Granger", "Main Character" , 10);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Hermione Granger", "Main Character" , 11);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Hermione Granger", "Main Character" , 12);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Harry Potter", "Main Character" , 9);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Harry Potter", "Main Character" , 10);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Harry Potter", "Main Character" , 11);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Harry Potter", "Main Character" , 12);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Ron Weasley", "Main Character" , 9);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Ron Weasley", "Main Character" , 10);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Ron Weasley", "Main Character" , 11);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Ron Weasley", "Main Character" , 12);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Bella Swan", "Main Character" , 13);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Bella Swan", "Main Character" , 14);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Bella Swan", "Main Character" , 15);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Bella Swan", "Main Character" , 16);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Edward Cullen", "Main Character" , 13);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Edward Cullen", "Main Character" , 14);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Edward Cullen", "Main Character" , 15);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Edward Cullen", "Main Character" , 16);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Jasper Cullen", "Side Character" , 13);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Jasper Cullen", "Side Character" , 14);
+INSERT INTO characters (name, character_type,  book_id) VALUES ("Jasper Cullen", "Side Character" , 15);
+
+
+#Show all books and their authors
+SELECT b.title as book, a.first_name ||' '|| a.last_name  as author
+FROM books b
+JOIN authors a ON b.author_id = a.id;
+
+#Create a list of all characters, including the books and authors they come from
+SELECT c.name as character, b.title as book, a.first_name ||' '|| a.last_name  as author
+FROM books b
+JOIN characters c ON b.id = c.book_id
+JOIN authors a ON b.author_id = a.id;
+
+#What books was the character bella swan in and who was the author
+SELECT c.name as character, b.title as book, a.first_name ||' '|| a.last_name  as author
+FROM books b
+JOIN characters c ON b.id = c.book_id
+JOIN authors a ON b.author_id = a.id
+WHERE c.name = "Bella Swan";
+
+#How many characters are in each book, group the total amount by book
+SELECT COUNT(c.id) as characters, b.title as book
+FROM characters c
+JOIN books b ON c.book_id = b.id
+GROUP BY book;
+
+#What books did Stephanie Garber write
+SELECT a.first_name ||' '|| a.last_name  as author, b.title as book
+FROM authors a
+JOIN books b ON a.id = b.author_id
+WHERE author = "Stephanie Garber";
+
+
+#Write the title of each book and the famous author it was written by on one line, 
+#Group results using the book id and order by author to keep written works together
+SELECT b.title || " " ||
+CASE
+    WHEN b.author_id = 1
+    THEN " was written by Sarah J. Mass"
+    WHEN b.author_id = 2
+    THEN " was written by Stephanie Garber"
+    WHEN b.author_id = 3
+    THEN " was written by J.K. Rowling"
+    WHEN b.author_id = 4
+    THEN " was written by Stephenie Meyer"
+    ELSE ""
+END AS authors_works    
+FROM books b
+Join authors a
+GROUP BY b.title
+ORDER by b.author_id;
