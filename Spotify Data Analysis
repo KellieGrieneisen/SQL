@@ -1,0 +1,60 @@
+##In this SQL, I am querying a dataset from (https://www.kaggle.com/datasets/equinxx/spotify-top-50-songs-in-2021?resource=download) 
+## to quantify statistics regarding Spotify artists and tracks
+
+#What artists have tracks in the top 10% in the popularity category?
+SELECT DISTINCT artist_name
+FROM BIT_DB.Spotifydata
+WHERE popularity > 90;
+
+#What tracks in the top 10% popularity have intrumentals, order them by the most acoustic to the least acoustic
+SELECT artist_name, track_name
+FROM BIT_DB.Spotifydata
+WHERE instrumentalness <> 0
+AND popularity > 90
+ORDER BY acousticness desc;
+
+#What are the top 10 tracks with the highest danceability percentage?
+SELECT track_name, ROUND(danceability*100,1) as danceability_percentage
+FROM BIT_DB.Spotifydata
+ORDER BY danceability desc
+LIMIT 10;
+
+#How many tracks does Olivia Rodrigo have on the chart?
+SELECT artist_name, count(artist_name) as track_count
+FROM BIT_DB.Spotifydata
+WHERE artist_name = 'Olivia Rodrigo';
+
+#What is the average tempo and danceability of the most popular songs?
+SELECT AVG(tempo), AVG(danceability)
+FROM BIT_DB.Spotifydata
+WHERE popularity >= 90;
+
+#What songs have the most words and how long are they in minutes?
+SELECT track_name ||' by ' || artist_name as song, duration_ms/60000 as minutes
+FROM BIT_DB.Spotifydata
+ORDER BY speechiness desc
+;
+
+#How many songs does justin beieber have one the chart? include features
+SELECT count(artist_name + track_name) as track_count
+FROM BIT_DB.Spotifydata
+WHERE artist_name = 'Justin Bieber'
+OR track_name LIKE '%Justin Bieber%';
+
+#What tracks does Justin Bieber feature on? Distinguish if they are his own traacks or a feature.
+SELECT track_name, 
+CASE
+ WHEN artist_name = 'Justin Bieber' THEN "Justin Bieber's Track"
+ WHEN track_name LIKE '%Justin Bieber%' THEN 'Justin Bieber is featured on this track'
+ ELSE 0
+END AS artist_association
+FROM BIT_DB.Spotifydata
+WHERE artist_name = 'Justin Bieber'
+OR track_name LIKE '%Justin Bieber%'
+;
+
+#What is the longest track on the chart?
+SELECT track_name
+FROM BIT_DB.Spotifydata
+ORDER BY duration_ms desc
+LIMIT 1;
