@@ -1,0 +1,86 @@
+##In this SQL, I am querying a Music Sales Database to quantify statistics 
+##regarding sales agents, customers, invoices, and meta data for individual albums bought.
+
+#Show Customers (their full names, customer ID, and country) who are not in the US.
+SELECT FirstName ||' '|| LastName as Fullname, CustomerId, Country
+FROM chinook.customers
+WHERE Country <> 'USA';
+
+#Show only the Customers from Brazil
+SELECT * 
+FROM chinook.customers
+WHERE Country = 'Brazil';
+
+#Find the Invoices of customers who are from Brazil. 
+#The resulting table should show the customer's full name, Invoice ID, Date of the invoice, 
+#and billing country.
+SELECT C.FirstName ||' '|| LastName as Fullname,I.InvoiceId, I.InvoiceDate, I.BillingCountry
+FROM chinook.invoices I
+LEFT JOIN chinook.customers C ON C.customerId = I.customerId;
+
+#Show the Employees who are Sales Agents
+SELECT *
+FROM chinook.employees
+WHERE Title = 'Sales Support Agent';
+
+#Find a unique/distinct list of billing countries from the Invoice table.
+SELECT DISTINCT BillingCountry
+FROM chinook.invoices;
+
+#Provide a query that shows the invoices associated with each sales agent. 
+#The resulting table should include the Sales Agent's full name.
+WITH salesAgents AS (
+SELECT E.FirstName ||' '|| E.LastName as AgentName, C.CustomerID as CustID
+FROM customers C
+JOIN employees E ON E.employeeId = C.SupportRepId)
+
+SELECT  *
+FROM invoices I
+LEFT JOIN salesAgents S ON S.CustID = I.customerId;
+
+#Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
+WITH customerData_CTE AS (
+SELECT E.FirstName ||' '|| E.LastName as Agent, C.FirstName ||' '|| C.LastName as Customer, C.customerId as CustId
+FROM customers C
+JOIN employees E ON E.employeeId = C.SupportRepId)
+
+SELECT I.Total, C.Customer, I.BillingCountry, C.Agent
+FROM invoices I
+LEFT JOIN customerData_CTE C ON C.CustId = I.customerId;
+
+#How many Invoices were there in 2009?
+SELECT COUNT(*) as Invoices
+FROM chinook.invoices
+WHERE InvoiceDate LIKE '%2009%';
+
+#What are the total sales for 2009?
+SELECT SUM(Total)
+FROM chinook.invoices
+WHERE InvoiceDate LIKE '%2009%';
+
+#Write a query that includes the purchased track name with each invoice line ID.
+SELECT I.InvoiceLineID, T.Name
+FROM chinook.invoice_items I
+LEFT JOIN chinook.tracks T ON T.trackID = I.TrackId;
+
+#Write a query that includes the purchased track name AND artist name with each invoice line ID.
+WITH ArtistInfo AS (
+SELECT art.Name as Artist, alb.AlbumId as AlbumID
+FROM artists art
+LEFT JOIN albums alb ON art.ArtistId = alb.ArtistId
+)
+
+SELECT I.InvoiceLineID, T.Name as Track, A.Artist
+FROM invoice_items I
+LEFT JOIN tracks T ON T.trackID = I.TrackId
+LEFT JOIN ArtistInfo A ON a.AlbumID = T.AlbumID;
+
+
+#Show all the Tracks, and include the Album name, Media type, and Genre.
+SELECT T.Name as Track, 
+A.Title as Album,
+M.Name as 'Media Type', G.Name as Genre
+FROM tracks T
+LEFT JOIN albums A ON T.AlbumID = A.AlbumID
+LEFT JOIN media_types M ON M.MediaTypeId = t.MediaTypeId
+LEFT JOIN genres G ON G.GenreId = T.GenreId;
