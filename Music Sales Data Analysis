@@ -161,3 +161,17 @@ order by tracks desc LIMIT 1;
 SELECT HireDate
 FROM chinook.employees
 ORDER BY HireDate desc LIMIT 1;
+
+#Show the name and email of customers who have purchased the track Nice Guys Finish Last?
+With purchased as (
+SELECT T.name as track, T.trackid as trackid, I.invoiceid as invoiceid
+FROM invoice_items I
+JOIN tracks T ON T.trackid = I.trackid
+)
+
+SELECT c.FirstName ||' '|| c.LastName as fullname, 
+c.email
+FROM customers c
+JOIN invoices i ON c.customerid = i.customerid
+LEFT JOIN purchased p ON i.invoiceid = p.invoiceid
+WHERE p.track = 'Nice Guys Finish Last';
