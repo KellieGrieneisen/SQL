@@ -84,3 +84,80 @@ FROM tracks T
 LEFT JOIN albums A ON T.AlbumID = A.AlbumID
 LEFT JOIN media_types M ON M.MediaTypeId = t.MediaTypeId
 LEFT JOIN genres G ON G.GenreId = T.GenreId;
+
+#Show the total sales made by each agent
+WITH salesAgents AS (
+SELECT E.FirstName ||' '|| E.LastName as AgentName, C.CustomerID as CustID
+FROM customers C
+JOIN employees E ON E.employeeId = C.SupportRepId)
+
+SELECT  S.AgentName , ROUND(SUM(I.Total), 2) as Sales
+FROM invoices I
+LEFT JOIN salesAgents S ON S.CustID = I.customerId
+GROUP BY S.AgentName;
+
+#Which sales agent made the most dollars in sales in 2009?
+WITH salesAgents AS (
+SELECT E.FirstName ||' '|| E.LastName as AgentName, C.CustomerID as CustID
+FROM customers C
+JOIN employees E ON E.employeeId = C.SupportRepId)
+
+SELECT  S.AgentName, ROUND(SUM(I.Total), 2) as Sales
+FROM invoices I
+LEFT JOIN salesAgents S ON S.CustID = I.customerId
+WHERE I.InvoiceDate LIKE '%2009%'
+GROUP BY S.AgentName
+ORDER BY sales desc
+LIMIT 1;
+
+#What were the total sales each year from 2009-2013?
+SELECT ROUND(SUM(total),2) as sales, 
+CASE
+WHEN InvoiceDate LIKE '2009%' THEN '2009'
+WHEN InvoiceDate LIKE '2010%' THEN '2010'
+WHEN InvoiceDate LIKE '2011%' THEN '2011'
+WHEN InvoiceDate LIKE '2012%' THEN '2012'
+ELSE'2013'
+END AS InvYear
+FROM chinook.invoices
+GROUP BY InvYear;
+
+#Which country has the highest amount of invoices?
+SELECT Count(BillingCountry) as invoices, BillingCountry
+FROM chinook.invoices
+GROUP BY BillingCountry
+ORDER BY invoices desc LIMIT 1;
+
+#What are the top 5 genres?
+SELECT Count(T.genreId) as songs, G.Name as Genre
+FROM chinook.genres G
+JOIN chinook.Tracks T ON T.genreId = G.genreId
+GROUP BY Genre
+ORDER BY songs desc LIMIT 5;
+
+#Which country bought the most tracks in the Rock Genre?
+WITH invoice_cte as(
+SELECT I.BillingCountry, IT.InvoiceID, IT.TrackId
+FROM invoice_items IT
+JOIN invoices I ON I.InvoiceId = IT.InvoiceId)
+
+SELECT Count(I.BillingCountry) as tracks, I.BillingCountry as country
+FROM tracks T
+JOIN invoice_cte I ON I.TrackId = T.trackId
+JOIN genres g ON g.genreId = T.genreId
+WHERE g.name = 'Rock'
+GROUP BY country
+ORDER BY tracks desc LIMIT 1;
+
+#Which playlist has the most tracks?
+SELECT p.Name,count(pt.trackid) as tracks
+FROM chinook.playlists p
+JOIN chinook.playlist_track pt ON pt.playlistid = p.playlistid
+WHERE p.name <> 'Music'
+GROUP BY p.name
+order by tracks desc LIMIT 1;
+
+#When was the last employee hired?
+SELECT HireDate
+FROM chinook.employees
+ORDER BY HireDate desc LIMIT 1;
